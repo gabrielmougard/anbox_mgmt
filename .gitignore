@@ -1,1 +1,2 @@
-scripts/postresql/migrate
+# migration tool
+scripts/postgresql/migrate
