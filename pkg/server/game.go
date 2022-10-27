@@ -273,33 +273,33 @@ func (s *Server) linkGames() http.HandlerFunc {
 			return
 		}
 
-		if *input.User.Age >= *input.Game.AgeRating {
-			// 1) Getting userID and gameID
-			filterUser := models.UserFilter{
-				Email:    input.User.Email,
-				Username: input.User.Username,
-				Age:      input.User.Age,
-			}
-			users, err := s.userService.Users(r.Context(), filterUser)
-			if err != nil {
-				serverError(w, err)
-				return
-			}
-			filterGame := models.GameFilter{
-				Title:       input.Game.Title,
-				Description: input.Game.Description,
-				URL:         input.Game.URL,
-				AgeRating:   input.Game.AgeRating,
-				Publisher:   input.Game.Publisher,
-			}
-			games, err := s.gameService.Games(r.Context(), filterGame)
-			if err != nil {
-				serverError(w, err)
-				return
-			}
-			if len(users) > 0 && len(games) > 0 {
-				user := users[0]
-				game := games[0]
+		// 1) Getting userID and gameID
+		filterUser := models.UserFilter{
+			Email:    input.User.Email,
+			Username: input.User.Username,
+			Age:      input.User.Age,
+		}
+		users, err := s.userService.Users(r.Context(), filterUser)
+		if err != nil {
+			serverError(w, err)
+			return
+		}
+		filterGame := models.GameFilter{
+			Title:       input.Game.Title,
+			Description: input.Game.Description,
+			URL:         input.Game.URL,
+			AgeRating:   input.Game.AgeRating,
+			Publisher:   input.Game.Publisher,
+		}
+		games, err := s.gameService.Games(r.Context(), filterGame)
+		if err != nil {
+			serverError(w, err)
+			return
+		}
+		if len(users) > 0 && len(games) > 0 {
+			user := users[0]
+			game := games[0]
+			if user.Age >= game.AgeRating {
 				// 2) Create Metadata
 				md := &models.Metadata{
 					PlayerID:     user.ID,
@@ -314,11 +314,11 @@ func (s *Server) linkGames() http.HandlerFunc {
 				}
 				writeJSON(w, http.StatusNoContent, nil)
 			} else {
-				badRequestError(w)
+				invalidUserAgeError(w)
 				return
 			}
 		} else {
-			invalidUserAgeError(w)
+			badRequestError(w)
 			return
 		}
 	}
