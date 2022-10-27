@@ -28,8 +28,8 @@ type User struct {
 	Username     string    `json:"username,omitempty"`
 	Token        string    `json:"token,omitempty"`
 	PasswordHash string    `json:"-" db:"password_hash"`
-	CreatedAt    time.Time `json:"-" db:"created_at"`
-	UpdatedAt    time.Time `json:"-" db:"updated_at"`
+	CreatedAt    time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt    time.Time `json:"updatedAt" db:"updated_at"`
 }
 
 var AnonymousUser User

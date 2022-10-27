@@ -107,7 +107,7 @@ func (s *Server) listGames() http.HandlerFunc {
 			return
 		}
 
-		writeJSON(w, http.StatusOK, M{"games": games})
+		writeJSON(w, http.StatusOK, M{"games": games, "gamesCount": len(games)})
 	}
 }
 
@@ -189,7 +189,7 @@ func (s *Server) deleteGames() http.HandlerFunc {
 			filter.URL = &v
 		}
 
-		if v := query.Get("age"); v != "" {
+		if v := query.Get("age_rating"); v != "" {
 			age, err := strconv.Atoi(v)
 			if err != nil {
 				serverError(w, err)
@@ -237,7 +237,7 @@ func (s *Server) linkGames() http.HandlerFunc {
 	type Input struct {
 		User struct {
 			Email    *string `json:"email,omitempty"`
-			Username *string `json:"username,omitempty"`
+			Username *string `json:"username,omitempty" validate:"required"`
 			Age      *uint   `json:"age,omitempty"`
 			Password *string `json:"password,omitempty"`
 		} `json:"user,omitempty" validate:"required"`
@@ -247,7 +247,7 @@ func (s *Server) linkGames() http.HandlerFunc {
 			URL         *string `json:"url"`
 			AgeRating   *uint   `json:"ageRating"`
 			Publisher   *string `json:"publisher"`
-		} `json:"game"`
+		} `json:"game,omitempty" validate:"required"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := userFromContext(r.Context())
@@ -312,6 +312,7 @@ func (s *Server) linkGames() http.HandlerFunc {
 					serverError(w, err)
 					return
 				}
+				writeJSON(w, http.StatusNoContent, nil)
 			} else {
 				badRequestError(w)
 				return

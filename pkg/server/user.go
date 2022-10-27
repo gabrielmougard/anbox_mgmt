@@ -30,8 +30,8 @@ import (
 var validate *validator.Validate
 
 type mergedUserWithMetadata struct {
-	*models.User
-	Metadata []*models.Metadata `json:"metadata"`
+	*models.User `json:"user"`
+	Metadata     []*models.Metadata `json:"metadata"`
 }
 
 func init() {
@@ -113,7 +113,7 @@ func (s *Server) createUser() http.HandlerFunc {
 			return
 		}
 
-		writeJSON(w, http.StatusCreated, M{"user": userWithMD})
+		writeJSON(w, http.StatusCreated, M{"userWithMetadata": userWithMD})
 	}
 }
 
@@ -159,7 +159,7 @@ func (s *Server) loginUser() http.HandlerFunc {
 			return
 		}
 
-		writeJSON(w, http.StatusOK, M{"user": userWithMD})
+		writeJSON(w, http.StatusOK, M{"userWithMetadata": userWithMD})
 
 	}
 }
@@ -179,16 +179,6 @@ func (s *Server) listUsers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 		filter := models.UserFilter{}
-
-		if v := query.Get("id"); v != "" {
-			id, err := strconv.Atoi(v)
-			if err != nil {
-				serverError(w, err)
-				return
-			}
-			uid := uint(id)
-			filter.ID = &uid
-		}
 
 		if v := query.Get("email"); v != "" {
 			filter.Email = &v
@@ -224,7 +214,7 @@ func (s *Server) listUsers() http.HandlerFunc {
 			}
 			usersWithMd = append(usersWithMd, &userWithMD)
 		}
-		writeJSON(w, http.StatusOK, M{"users": usersWithMd})
+		writeJSON(w, http.StatusOK, M{"usersWithMetadata": usersWithMd, "usersCount": len(usersWithMd)})
 	}
 }
 
@@ -276,7 +266,7 @@ func (s *Server) updateUser() http.HandlerFunc {
 			return
 		}
 
-		writeJSON(w, http.StatusOK, M{"user": userWithMD})
+		writeJSON(w, http.StatusOK, M{"userWithMetadata": userWithMD})
 	}
 }
 
@@ -284,16 +274,6 @@ func (s *Server) deleteUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 		filter := models.UserFilter{}
-
-		if v := query.Get("id"); v != "" {
-			id, err := strconv.Atoi(v)
-			if err != nil {
-				serverError(w, err)
-				return
-			}
-			uid := uint(id)
-			filter.ID = &uid
-		}
 
 		if v := query.Get("email"); v != "" {
 			filter.Email = &v
