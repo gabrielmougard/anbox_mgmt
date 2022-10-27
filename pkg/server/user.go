@@ -333,6 +333,8 @@ func mergeUserWithGamingMetadata(ctx context.Context, user *models.User, metadat
 	}
 	for _, m := range md {
 		m.PlayTimeHuman = humanReadablePlayTime(m.PlayTime)
+		m.GameTitle = m.PlayedGame.Title
+		m.PlayerUsername = m.Player.Username
 	}
 	return mergedUserWithMetadata{user, md}, nil
 }
