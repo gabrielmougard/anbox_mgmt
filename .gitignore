@@ -4,3 +4,6 @@ scripts/postgresql/migrate
 # binaries
 bin/anbox-cli
 bin/anbox-server
+
+#tmp files
+.anbox-cli.jwt

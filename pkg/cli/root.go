@@ -18,18 +18,26 @@ import (
 	//"fmt"
 	//"os"
 	"anbox_mgmt/pkg/config"
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/spf13/cobra"
 )
 
 var cfg config.Config
+
+type ApiCallOption int64
+
+const (
+	SAVE_TOKEN ApiCallOption = iota
+)
 
 func init() {
 	cfg = config.EnvConfig()
@@ -46,6 +54,40 @@ func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
 
+func readJWT() string {
+	readFile, err := os.Open(cfg.CLIJwtFile)
+	if err != nil {
+		return ""
+	}
+
+	defer readFile.Close()
+
+	fileScanner := bufio.NewScanner(readFile)
+
+	fileScanner.Split(bufio.ScanLines)
+
+	for fileScanner.Scan() {
+		return fileScanner.Text()
+	}
+	return ""
+}
+
+func writeJWT(token string) {
+	f, err := os.Create(cfg.CLIJwtFile)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+
+	_, err2 := f.WriteString(token)
+
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+}
+
 func queryBuild(query string, k string, v string) string {
 	if query == "" {
 		query += "?"
@@ -54,12 +96,15 @@ func queryBuild(query string, k string, v string) string {
 	return query
 }
 
-func apiCall(verb string, path string, query string) {
+func apiCall(verb string, path string, query string, options ...ApiCallOption) {
 	req, err := http.NewRequest(verb, fmt.Sprintf("http://0.0.0.0:%s/api/v1/%s%s", cfg.Port, path, query), nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", readJWT()) // Once token in ctx, the calls are authenticated
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -72,10 +117,18 @@ func apiCall(verb string, path string, query string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println(string(b))
+
+	var prettyJSON bytes.Buffer
+	error := json.Indent(&prettyJSON, b, "", "\t")
+	if error != nil {
+		log.Println("JSON parse error: ", error)
+		return
+	}
+
+	fmt.Println(string(prettyJSON.Bytes()))
 }
 
-func apiCallPayload(verb string, path string, payload interface{}) {
+func apiCallPayload(verb string, path string, payload interface{}, options ...ApiCallOption) {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		log.Fatalln(err)
@@ -86,9 +139,10 @@ func apiCallPayload(verb string, path string, payload interface{}) {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "<API Key>") // TODO
+	req.Header.Set("Authorization", readJWT()) // Once token in ctx, the calls are authenticated
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -100,5 +154,40 @@ func apiCallPayload(verb string, path string, payload interface{}) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println(string(b))
+
+	var prettyJSON bytes.Buffer
+	error := json.Indent(&prettyJSON, b, "", "\t")
+	if error != nil {
+		log.Println("JSON parse error: ", error)
+		return
+	}
+
+	fmt.Println(string(prettyJSON.Bytes()))
+
+	for _, op := range options {
+		if op == SAVE_TOKEN {
+
+			type user struct {
+				Token string `json:"token"`
+				X     map[string]interface{}
+			}
+			type userIR struct {
+				User user `json:"user"`
+				X    map[string]interface{}
+			}
+			type userWithMD struct {
+				UserWithMetadata userIR `json:"userWithMetadata"`
+				X                map[string]interface{}
+			}
+
+			uwmd := userWithMD{}
+			err := json.Unmarshal(prettyJSON.Bytes(), &uwmd)
+			if err != nil {
+				log.Println("Could not unmarshal token from response: ", err)
+				return
+			}
+			rootToken := uwmd.UserWithMetadata.User.Token
+			writeJWT(rootToken)
+		}
+	}
 }

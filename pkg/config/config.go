@@ -30,6 +30,7 @@ type Config struct {
 	DbURI                           string
 	GameTrafficFreq                 time.Duration
 	GameTrafficLimitPlayTimePerFreq int32
+	CLIJwtFile                      string
 }
 
 func EnvConfig() Config {
@@ -75,5 +76,10 @@ func EnvConfig() Config {
 	}
 	gameTrafficLimitPlayTimePerFreq = int32(gameTrafficLimitPlayTimePerFreqInt)
 
-	return Config{port, dbURI, time.Duration(int32(gameTrafficFreq)) * time.Second, gameTrafficLimitPlayTimePerFreq}
+	CLIJwtFile, ok := os.LookupEnv("CLI_JWT_FILE")
+	if !ok {
+		panic("CLI_JWT_FILE not provided")
+	}
+
+	return Config{port, dbURI, time.Duration(int32(gameTrafficFreq)) * time.Second, gameTrafficLimitPlayTimePerFreq, CLIJwtFile}
 }

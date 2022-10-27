@@ -47,7 +47,7 @@ var loginCmd = &cobra.Command{
 		}{
 			loginUser,
 		}
-		apiCallPayload("POST", "users/login", payload)
+		apiCallPayload("POST", "users/login", payload, SAVE_TOKEN)
 	},
 }
 
