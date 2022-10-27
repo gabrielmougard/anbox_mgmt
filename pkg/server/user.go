@@ -170,7 +170,6 @@ func (s *Server) getCurrentUser() http.HandlerFunc {
 		user := userFromContext(ctx)
 		user.Token = userTokenFromContext(ctx)
 
-		// TODO : merge metadata here
 		writeJSON(w, http.StatusOK, M{"user": user})
 	}
 }

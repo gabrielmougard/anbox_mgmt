@@ -120,7 +120,6 @@ psql-print-env:
 
 
 #Force postgres to reinitialize everything which happens in the docker postgresql run.sh script if db is not initialized
-#TODO: Add a confirm here
 psql-delete-data-dir:
 	sudo rm -rf /opt/data/postgresql 
 
