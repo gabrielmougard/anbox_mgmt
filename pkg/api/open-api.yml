@@ -23,6 +23,14 @@ info:
 servers:
   - url: http://0.0.0.0:6000/api/v1
 paths:
+  /health:
+    get:
+      summary: API health check
+      description: API health check
+      operationId: HealthCheck
+      responses:
+        200:
+          description: OK
   /games:
     delete:
       summary: Delete a game
@@ -70,6 +78,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericError'
+      security:
+        - Token: []
     get:
       summary: List games
       description: List games. Auth required.
@@ -116,6 +126,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericError'
+      security:
+        - Token: []
     put:
       summary: Update a game
       description: Update a game. Auth is required
@@ -170,7 +182,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-codegen-request-body-name: body
+      security:
+        - Token: []
+      x-codegen-request-body-name: game
   /games/link:
     post:
       summary: link a game with a user
@@ -196,6 +210,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericError'
+      security:
+        - Token: []
   /users:
     delete:
       summary: Delete the users
@@ -233,6 +249,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericError'
+      security:
+        - Token: []
     get:
       summary: List the users
       description: List the users
@@ -269,6 +287,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericError'
+      security:
+        - Token: []
     put:
       summary: Update the current user. The one you logged in with.
       description: Updated user information for current user. Auth required.
@@ -298,7 +318,7 @@ paths:
                 $ref: '#/components/schemas/GenericError'
       security:
         - Token: []
-      x-codegen-request-body-name: body
+      x-codegen-request-body-name: user
     post:
       summary: Create a new user.
       description: Create a new user. Auth NOT required.
@@ -326,16 +346,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericError'
-      security:
-        - Token: []
-      x-codegen-request-body-name: body
   /users/login:
     post:
-      summary: Existing user login
+      summary: Login for existing user
       description: Login for existing user
       operationId: UserLogin
       requestBody:
-        description: Credentials to use
+        description: Credentials to login
         content:
           application/json:
             schema:
@@ -357,7 +374,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericError'
-      x-codegen-request-body-name: body
 components:
   schemas:
     Game:
