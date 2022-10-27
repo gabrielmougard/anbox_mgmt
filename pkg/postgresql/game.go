@@ -174,6 +174,21 @@ func findGames(ctx context.Context, tx *sqlx.Tx, filter models.GameFilter) ([]*m
 	return games, nil
 }
 
+func findGameByID(ctx context.Context, tx *sqlx.Tx, id uint) (*models.Game, error) {
+	return findOneGame(ctx, tx, models.GameFilter{ID: &id})
+}
+
+func findOneGame(ctx context.Context, tx *sqlx.Tx, filter models.GameFilter) (*models.Game, error) {
+	games, err := findGames(ctx, tx, filter)
+
+	if err != nil {
+		return nil, err
+	} else if len(games) == 0 {
+		return nil, models.ErrNotFound
+	}
+	return games[0], nil
+}
+
 func deleteGame(ctx context.Context, tx *sqlx.Tx, id uint) error {
 	query := "DELETE FROM games WHERE id = $1"
 	return execQuery(ctx, tx, query, id)

@@ -23,15 +23,17 @@ import (
 // e.g: User A played X1 hours on Game B and X2 hours on Game C and ... X3 hours on Game D ...
 
 type Metadata struct {
-	ID            uint      `json:"-"`
-	PlayerID      uint      `json:"-" db:"player_id"`
-	Player        *User     `json:"player"`
-	PlayedGameID  uint      `json:"-" db:"played_game_id"`
-	PlayedGame    *Game     `json:"playedGame"`
-	PlayTime      uint      `json:"playTime" db:"play_time"`
-	PlayTimeHuman string    `json:"playTimeHuman"`
-	CreatedAt     time.Time `json:"createdAt" db:"created_at"`
-	UpdatedAt     time.Time `json:"updatedAt" db:"updated_at"`
+	ID             uint      `json:"-"`
+	PlayerID       uint      `json:"-" db:"player_id"`
+	Player         *User     `json:"player"`
+	PlayedGameID   uint      `json:"-" db:"played_game_id"`
+	PlayedGame     *Game     `json:"playedGame"`
+	PlayTime       uint      `json:"playTime" db:"play_time"`
+	PlayTimeHuman  string    `json:"playTimeHuman"`
+	PlayerUsername string    `json:"playerUsername"`
+	GameTitle      string    `json:"gameTitle"`
+	CreatedAt      time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt      time.Time `json:"updatedAt" db:"updated_at"`
 }
 
 type MetadataFilter struct {
