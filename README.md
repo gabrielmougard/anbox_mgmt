@@ -78,6 +78,16 @@ Use "anbox-cli [command] --help" for more information about a command.
 
 * Once you have a running server, you can import the **OpenAPI** specification at `pkg/api/open-api.yml` in Postman to directly interact with the server through the beautiful Postman UI. This solution is ideal to see the API  documentation and use the prefilled Postman queries for each API calls.
 
+## Fun features
+
+* `user` and `game` CRUD
+* `metadata` association
+* Random game traffic simulator in `pkg/server/server.go`
+* JWT auth
+* OpenAPI integration
+* Migration tooling is quite efficient
+* Highly flexible and helping CLI 
+
 ## Pro tips
 
 * If you use the CLI, you can first create a user (no auth allowed) and then login with it to be allowed to interact with the system :
