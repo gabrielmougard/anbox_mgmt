@@ -149,7 +149,7 @@ func updateMetadata(ctx context.Context, tx *sqlx.Tx, md *models.Metadata, patch
 
 	query := `
 	UPDATE metadata
-	SET playTime = $1, updated_at = NOW() WHERE id = $2
+	SET play_time = $1, updated_at = NOW() WHERE id = $2
 	RETURNING updated_at`
 
 	if err := tx.QueryRowxContext(ctx, query, args...).Scan(&md.UpdatedAt); err != nil {
@@ -185,13 +185,13 @@ func findMetadata(ctx context.Context, tx *sqlx.Tx, filter models.MetadataFilter
 	}
 
 	query := "SELECT * from metadata" + formatWhereClause(where) + " ORDER BY created_at DESC"
-	articles, err := queryMetadata(ctx, tx, query, args...)
+	md, err := queryMetadata(ctx, tx, query, args...)
 
 	if err != nil {
-		return articles, err
+		return md, err
 	}
 
-	return articles, nil
+	return md, nil
 }
 
 func queryMetadata(ctx context.Context, tx *sqlx.Tx, query string, args ...interface{}) ([]*models.Metadata, error) {
@@ -201,5 +201,28 @@ func queryMetadata(ctx context.Context, tx *sqlx.Tx, query string, args ...inter
 		return md, err
 	}
 
+	for _, m := range md {
+		if err := attachMetadataAssociations(ctx, tx, m); err != nil {
+			return nil, err
+		}
+	}
+
 	return md, nil
+}
+
+func attachMetadataAssociations(ctx context.Context, tx *sqlx.Tx, md *models.Metadata) error {
+	user, err := findUserByID(ctx, tx, md.PlayerID)
+	if err != nil {
+		return fmt.Errorf("cannot find metadata player: %w", err)
+	}
+
+	game, err := findGameByID(ctx, tx, md.PlayedGameID)
+	if err != nil {
+		return fmt.Errorf("cannot find metadata game: %w", err)
+	}
+
+	md.Player = user
+	md.PlayedGame = game
+
+	return nil
 }
