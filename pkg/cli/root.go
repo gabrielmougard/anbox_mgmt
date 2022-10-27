@@ -37,7 +37,7 @@ func init() {
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "anbox-mgmt-cli",
+	Use:   "anbox-cli",
 	Short: "Managing the Anbox application",
 	Long:  `Managing the Anbox application. We can do CRUD operations on "users" and "games" and also create links between entities`,
 }
