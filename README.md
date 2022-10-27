@@ -48,7 +48,7 @@ make build
 make run
 ```
 
-* The CLI client to interact with the server is at `bin/anbox-cli` :
+* The CLI client to interact with the server is at `bin/anbox-cli` (**use the full `./bin/anbox-client` path when executing, else some ENV variables won't be declared and the client will panic**):
 
 ```
 $ ./bin/anbox-cli --help
