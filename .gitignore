@@ -1,2 +1,6 @@
 # migration tool
 scripts/postgresql/migrate
+
+# binaries
+bin/anbox-cli
+bin/anbox-server
