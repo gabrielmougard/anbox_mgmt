@@ -331,5 +331,8 @@ func mergeUserWithGamingMetadata(ctx context.Context, user *models.User, metadat
 	if err != nil {
 		return mergedUserWithMetadata{}, err
 	}
+	for _, m := range md {
+		m.PlayTimeHuman = humanReadablePlayTime(m.PlayTime)
+	}
 	return mergedUserWithMetadata{user, md}, nil
 }

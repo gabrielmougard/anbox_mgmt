@@ -16,6 +16,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -86,4 +87,23 @@ func parseUserToken(tokenStr string) (userClaims M, err error) {
 	}
 
 	return M(claims), nil
+}
+
+func humanReadablePlayTime(playTime uint) string {
+	// playTime is in minute in DB
+	hours := playTime / 60
+	minutes := playTime % 60
+	if hours > 0 {
+		if minutes == 0 {
+			return fmt.Sprintf("%d h", hours)
+		} else {
+			return fmt.Sprintf("%d h %d min", hours, minutes)
+		}
+	} else {
+		if minutes > 0 {
+			return fmt.Sprintf("%d min", minutes)
+		} else {
+			return "No data" // should not happen though
+		}
+	}
 }
