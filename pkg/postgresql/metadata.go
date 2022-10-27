@@ -109,7 +109,7 @@ func (ms *MetadataService) DeleteMetadata(ctx context.Context, id uint) error {
 
 func createMetadata(ctx context.Context, tx *sqlx.Tx, md *models.Metadata) error {
 	query := `
-	INSERT INTO metadatas (player_id, played_game_id, play_time) 
+	INSERT INTO metadata (player_id, played_game_id, play_time) 
 	VALUES ($1, $2, $3) RETURNING id, created_at, updated_at
 	`
 
@@ -133,7 +133,7 @@ func createMetadata(ctx context.Context, tx *sqlx.Tx, md *models.Metadata) error
 }
 
 func deleteMetadata(ctx context.Context, tx *sqlx.Tx, id uint) error {
-	query := "DELETE FROM metadatas WHERE id = $1"
+	query := "DELETE FROM metadata WHERE id = $1"
 	return execQuery(ctx, tx, query, id)
 }
 

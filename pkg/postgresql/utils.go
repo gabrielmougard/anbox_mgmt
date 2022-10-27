@@ -57,7 +57,7 @@ func findMany(ctx context.Context, tx *sqlx.Tx, ss interface{}, query string, ar
 		return err
 	}
 
-	sVal := sPtrVal.Elem()                           // get the relfect.Value of the slice pointed to by ss
+	sVal := sPtrVal.Elem()                           // get the reflect.Value of the slice pointed to by ss
 	newSlice := reflect.MakeSlice(sVal.Type(), 0, 0) // new slice
 	elemType := sliceElemType(sVal)                  // get the slice element's type
 

@@ -18,9 +18,7 @@ import (
 	"anbox_mgmt/pkg/models"
 	"io"
 	"net/http"
-	"strings"
 
-	//"anbox_mgmt/pkg/models"
 	"github.com/gorilla/handlers"
 )
 
@@ -35,9 +33,9 @@ func (s *Server) authenticate(mustAuth bool) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("Vary", "Authorization")
-			authHeader := r.Header.Get("Authorization")
+			authToken := r.Header.Get("Authorization")
 
-			if authHeader == "" {
+			if authToken == "" {
 				if mustAuth {
 					invalidAuthTokenError(w)
 				} else {
@@ -48,16 +46,7 @@ func (s *Server) authenticate(mustAuth bool) func(http.Handler) http.Handler {
 				return
 			}
 
-			ss := strings.Split(authHeader, " ")
-
-			if len(ss) < 2 {
-				invalidAuthTokenError(w)
-				return
-			}
-
-			token := ss[1]
-
-			claims, err := parseUserToken(token)
+			claims, err := parseUserToken(authToken)
 
 			if err != nil {
 				invalidAuthTokenError(w)
@@ -74,7 +63,7 @@ func (s *Server) authenticate(mustAuth bool) func(http.Handler) http.Handler {
 			}
 
 			r = setContextUser(r, user)
-			r = setContextUserToken(r, token)
+			r = setContextUserToken(r, authToken)
 			h.ServeHTTP(w, r)
 		})
 	}

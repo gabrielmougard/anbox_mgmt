@@ -24,7 +24,7 @@ type Game struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	URL         string    `json:"url"`
-	AgeRating   uint      `json:"ageRating"`
+	AgeRating   uint      `json:"ageRating" db:"age_rating"`
 	Publisher   string    `json:"publisher"`
 	CreatedAt   time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt   time.Time `json:"updatedAt" db:"updated_at"`

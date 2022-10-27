@@ -105,7 +105,7 @@ func (gs *GameService) DeleteGame(ctx context.Context, id uint) error {
 
 func createGame(ctx context.Context, tx *sqlx.Tx, game *models.Game) error {
 	query := `
-	INSERT INTO games (title, description, url, ageRating, publisher) 
+	INSERT INTO games (title, description, url, age_rating, publisher) 
 	VALUES ($1, $2, $3, $4, $5) RETURNING id, created_at, updated_at
 	`
 
@@ -156,7 +156,7 @@ func findGames(ctx context.Context, tx *sqlx.Tx, filter models.GameFilter) ([]*m
 
 	if v := filter.AgeRating; v != nil {
 		argPosition++
-		where, args = append(where, fmt.Sprintf("ageRating = $%d", argPosition)), append(args, *v)
+		where, args = append(where, fmt.Sprintf("age_rating = $%d", argPosition)), append(args, *v)
 	}
 
 	if v := filter.Publisher; v != nil {
@@ -181,9 +181,7 @@ func deleteGame(ctx context.Context, tx *sqlx.Tx, id uint) error {
 
 func queryGames(ctx context.Context, tx *sqlx.Tx, query string, args ...interface{}) ([]*models.Game, error) {
 	games := make([]*models.Game, 0)
-	err := findMany(ctx, tx, &games, query, args...)
-
-	if err != nil {
+	if err := findMany(ctx, tx, &games, query, args...); err != nil {
 		return games, err
 	}
 
@@ -222,7 +220,7 @@ func updateGame(ctx context.Context, tx *sqlx.Tx, game *models.Game, patch model
 
 	query := `
 	UPDATE games 
-	SET title = $1, description = $2, url = $3, ageRating = $4, publisher = $5, updated_at = NOW() WHERE id = $6
+	SET title = $1, description = $2, url = $3, age_rating = $4, publisher = $5, updated_at = NOW() WHERE id = $6
 	RETURNING updated_at`
 
 	if err := tx.QueryRowxContext(ctx, query, args...).Scan(&game.UpdatedAt); err != nil {
