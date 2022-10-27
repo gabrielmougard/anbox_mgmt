@@ -1,0 +1,6 @@
+BEGIN;
+
+DROP TABLE IF EXISTS games;
+DROP TABLE IF EXISTS metadata;
+
+COMMIT;

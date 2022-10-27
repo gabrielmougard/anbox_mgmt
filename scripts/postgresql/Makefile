@@ -147,3 +147,10 @@ psql-add-migrate-ubuntu-client:
 	curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
 
 
+################################### Migration #####################
+
+psql-migrate-up:
+	./migrate -path migrations -database postgres://anboxcloud:anboxcloud@0.0.0.0:5432/anboxcloud up
+
+psql-migrate-down:
+	./migrate -path migrations -database postgres://anboxcloud:anboxcloud@0.0.0.0:5432/anboxcloud down
