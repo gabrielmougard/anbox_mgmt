@@ -332,4 +332,4 @@ $ ./bin/anbox-cli list user
 
 ## Conclusion
 
-I took a bit more time (around 12h) than expected but the project looks really nice now !
+I took a bit more time (around 7h) than expected but the project looks really nice now !
